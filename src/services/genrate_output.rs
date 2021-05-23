@@ -42,8 +42,8 @@ pub fn genrate_print(results: Vec<QueryResult>) {
         for json_value in result.result {
             println!(" ");
             println!("{}", result.table);
-            println!(" - ");
             for (key, value) in json_value.as_object().unwrap() {
+                println!(" - ");
                 if value.is_array() {
                     println!("  {}: ", key);
                     let n_value = value.as_array().unwrap();
