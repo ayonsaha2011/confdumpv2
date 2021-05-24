@@ -62,18 +62,23 @@ pub fn genrate_text(output_path: &str, results: Vec<QueryResult>) {
         "cannot open file");
     let write_line = || -> Result<(), Error> {
         for result in results {
-
+            writeln!(file, " ")?;
+            writeln!(file, "{}", result.table)?;
             for json_value in result.result {
-                writeln!(file, " ")?;
-                writeln!(file, "{}", result.table)?;
                 writeln!(file, " - ")?;
                 for (key, value) in json_value.as_object().unwrap() {
                     if value.is_array() {
                         writeln!(file, "  {}: ", key)?;
                         let n_value = value.as_array().unwrap();
                         for n_v in n_value {
-                            writeln!(file, "      - {}", format!("{:#}", n_v))?;
+                            if n_v.is_string() {
+                                writeln!(file, "      - {}", n_v.as_str().unwrap())?;
+                            } else {
+                                writeln!(file, "      - {}", format!("{:#}", n_v))?;
+                            }
                         }
+                    } else if value.is_string() {
+                        writeln!(file, "  {}: {}", key, value.as_str().unwrap())?;
                     } else {
                         writeln!(file, "  {}: {}", key, format!("{:#}", value))?;
                     }
@@ -98,24 +103,30 @@ pub fn genrate_xml(output_path:  &str, results: Vec<QueryResult>) {
         writeln!(file, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>")?;
         writeln!(file, "<collect date={:?} timestamp={:?} uuid=\"{}\">", date, local_time, new_uuid)?;
         for result in results {
+            writeln!(file, "    <query class=\"{}\">", result.table)?;
             for json_value in result.result {
-                writeln!(file, "    <query class=\"{}\">", result.table)?;
                 writeln!(file, "        <item>")?;
                 for (key, value) in json_value.as_object().unwrap() {
                     if value.is_array() {
                         writeln!(file, "            <attr name=\"{}\" operator=\"=\">", key)?;
                         let n_value = value.as_array().unwrap();
                         for n_v in n_value {
-                            writeln!(file, "                <element>{}</element>", format!("{:#}", n_v))?;
+                            if n_v.is_string() {
+                                writeln!(file, "                <element>{}</element>", n_v.as_str().unwrap())?;
+                            } else {
+                                writeln!(file, "                <element>{}</element>", format!("{:#}", n_v))?;
+                            }
                         }
                         writeln!(file, "            </attr>")?;
+                    } else if value.is_string() {
+                        writeln!(file, "            <attr name=\"{}\" operator=\"=\">{}</attr>", key, value.as_str().unwrap())?;
                     } else {
                         writeln!(file, "            <attr name=\"{}\" operator=\"=\">{}</attr>", key, format!("{:#}", value))?;
                     }
                 }
                 writeln!(file, "        </item>")?;
-                writeln!(file, "    </query>")?;
             }
+            writeln!(file, "    </query>")?;
         }
         writeln!(file, "</collect>")?;
 
@@ -131,22 +142,24 @@ pub fn genrate_json(output_path:  &str, results: Vec<QueryResult>) {
     let write_line = || -> Result<(), Error> {
         writeln!(file, "{{")?;
         for result in results {
-            writeln!(file, "    {:?}: {{", result.table)?;
+            writeln!(file, "    {:?}: [", result.table)?;
             for json_value in result.result {
+                writeln!(file, "        {{")?;
                 for (key, value) in json_value.as_object().unwrap() {
                     if value.is_array() {
-                        writeln!(file, "      {:?}: [", key)?;
+                        writeln!(file, "        {:?}: [", key)?;
                         let n_value = value.as_array().unwrap();
                         for n_v in n_value {
-                            writeln!(file, "            {}", format!("{:#}", n_v))?;
+                            writeln!(file, "                {}", format!("{:#}", n_v))?;
                         }
-                        writeln!(file, "      ],")?;
+                        writeln!(file, "        ],")?;
                     } else {
-                        writeln!(file, "      {:?}: {:?},", key, format!("{:#}", value))?;
+                        writeln!(file, "        {:?}: {:?},", key, format!("{:#}", value))?;
                     }
                 }
+                writeln!(file, "        }},")?;
             }
-            writeln!(file, "    }},")?;
+            writeln!(file, "    ],")?;
         }
         writeln!(file, "}}")?;
 

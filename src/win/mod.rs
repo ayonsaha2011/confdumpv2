@@ -18,3 +18,8 @@
 pub mod win32_operating_system;
 pub mod win32_computer_system;
 pub mod win32_service;
+mod win32_timezone;
+mod win32_systemdriver;
+mod win32_processor;
+mod win32_process;
+mod win32_networkadapter;
