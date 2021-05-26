@@ -18,11 +18,13 @@
 
 use wmi::{COMLibrary, Variant, WMIConnection};
 use crate::services::{genrate_output};
-use crate::win::{win32_operating_system::Win32_OperatingSystem, win32_computer_system::Win32_ComputerSystem, win32_service::Win32_Service};
 use std::error::Error;
 use std::fmt;
 use serde_json;
 use serde_json::Value;
+use serde::{Deserialize, Serialize};
+
+use crate::win::*;
 
 pub struct QueryResult {
     pub table: String,
@@ -52,74 +54,51 @@ impl Error for CDError {
     }
 }
 
+
+
 pub fn query(tables: Vec<String>, output_format: String) -> Result<Vec<QueryResult>, CDError> {
     let mut output = Vec::<QueryResult>::new();
-
-    let com_con = COMLibrary::new().unwrap();
-    let wmi_con = WMIConnection::new(com_con.into()).unwrap();
-
     for table in tables {
         println!("table - {}", table);
 
-        if  table == "Win32_OperatingSystem" {
-            let mut results_value = Vec::<Value>::new();
-            let results: Vec<Win32_OperatingSystem> = match wmi_con.query() {
-                Ok(result)  => result,
-                Err(e) => {println!("{:#?}", e); panic!(e) },
-            };
-            for result in results {
-                match serde_json::to_string(&result) {
-                    Ok(json_str)  => {
-                        let json_value: Value = serde_json::from_str(&json_str).unwrap();
-                        results_value.push( json_value);
-                    },
-                    Err(e) => println!("{:#?}", e),
-                }
-            }
-            output.push(QueryResult { table, result: results_value });
-
-        } else if  table == "Win32_ComputerSystem" {
-            let mut results_value = Vec::<Value>::new();
-            let results: Vec<Win32_ComputerSystem> = match wmi_con.query() {
-                Ok(result)  => result,
-                Err(e) => {println!("{:#?}", e); panic!(e) },
-            };
-            for result in results {
-                match serde_json::to_string(&result) {
-                    Ok(json_str)  => {
-                        let json_value: Value = serde_json::from_str(&json_str).unwrap();
-                        results_value.push( json_value);
-                    },
-                    Err(e) => println!("{:#?}", e),
-                }
-            }
-            output.push(QueryResult { table, result: results_value });
-
-        } else if  table == "Win32_Service" {
-            let mut results_value = Vec::<Value>::new();
-            let results: Vec<Win32_Service> = match wmi_con.query() {
-                Ok(result)  => result,
-                Err(e) => {println!("{:#?}", e); panic!(e) },
-            };
-            for result in results {
-                match serde_json::to_string(&result) {
-                    Ok(json_str)  => {
-                        let json_value: Value = serde_json::from_str(&json_str).unwrap();
-                        results_value.push( json_value);
-                    },
-                    Err(e) => println!("{:#?}", e),
-                }
-            }
-            output.push(QueryResult { table, result: results_value });
-
-        }else {
-            let error_str = format!("Oops! table - {} not implemented yet", table);
-            // println!(error_str);
-            return Err(CDError::new(&*error_str));
-        }
+        let wmi_result = match table.as_str() {
+            "Win32_OperatingSystem" => get_wmi_result::<win32_operating_system::Win32_OperatingSystem>(table),
+            "Win32_ComputerSystem" => get_wmi_result::<win32_computer_system::Win32_ComputerSystem>(table),
+            "Win32_Service" => get_wmi_result::<win32_service::Win32_Service>(table),
+            "Win32_SystemDriver" => get_wmi_result::<win32_system_driver::Win32_SystemDriver>(table),
+            "Win32_Process" => get_wmi_result::<win32_process::Win32_Process>(table),
+            "Win32_NetworkAdapter" => get_wmi_result::<win32_network_adapter::Win32_NetworkAdapter>(table),
+            "Win32_TimeZone" => get_wmi_result::<win32_timezone::Win32_TimeZone>(table),
+            "Win32_Processor" => get_wmi_result::<win32_processor::Win32_Processor>(table),
+            "Win32_BIOS" => get_wmi_result::<win32_bios::Win32_BIOS>(table),
+            "Win32_PhysicalMemory" => get_wmi_result::<win32_physical_memory::Win32_PhysicalMemory>(table),
+            "Win32_DiskDrive" => get_wmi_result::<win32_disk_drive::Win32_DiskDrive>(table),
+            "Win32_BaseBoard" => get_wmi_result::<win32_base_board::Win32_BaseBoard>(table),
+            _ => return Err(CDError::new(&*format!("Oops! table - {} not implemented yet", table)))
+        };
+        output.push(wmi_result);
     }
 
     Ok(output)
 }
 
+pub fn get_wmi_result<T: for<'de> Deserialize<'de> + Serialize>(table: String) -> QueryResult {
+    let mut results_value = Vec::<Value>::new();
+    let com_con = COMLibrary::new().unwrap();
+    let wmi_con = WMIConnection::new(com_con.into()).unwrap();
 
+    let results: Vec<T> = match wmi_con.query() {
+        Ok(result)  => result,
+        Err(e) => {println!("{:#?}", e); panic!(e) },
+    };
+    for result in results {
+        match serde_json::to_string(&result) {
+            Ok(json_str)  => {
+                let json_value: Value = serde_json::from_str(&json_str).unwrap();
+                results_value.push( json_value);
+            },
+            Err(e) => println!("{:#?}", e),
+        }
+    }
+    QueryResult{ table, result: results_value }
+}

@@ -1,2 +1,12 @@
 Win32_ComputerSystem
 Win32_OperatingSystem
+Win32_Service
+Win32_SystemDriver
+Win32_Process
+Win32_NetworkAdapter
+Win32_TimeZone
+Win32_Processor
+Win32_BIOS
+Win32_PhysicalMemory
+Win32_DiskDrive
+Win32_BaseBoard
