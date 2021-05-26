@@ -21,4 +21,21 @@ use wmi::WMIDateTime;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Win32_NetworkConnection {
+    pub Caption: Option<String>,
+    pub Description: Option<String>,
+    pub InstallDate: Option<String>,
+    pub Name: Option<String>,
+    pub Status: Option<String>,
+    pub AccessMask: Option<String>,
+    pub Comment: Option<String>,
+    pub ConnectionState: Option<String>,
+    pub ConnectionType: Option<String>,
+    pub DisplayType: Option<String>,
+    pub LocalName: Option<String>,
+    pub Persistent: Option<String>,
+    pub ProviderName: Option<String>,
+    pub RemoteName: Option<String>,
+    pub RemotePath: Option<String>,
+    pub ResourceType: Option<String>,
+    pub UserName: Option<String>
 }
