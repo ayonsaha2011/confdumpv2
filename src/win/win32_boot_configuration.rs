@@ -20,15 +20,14 @@ use serde::{Serialize, Deserialize};
 use wmi::WMIDateTime;
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Win32_Share {
-    pub AllowMaximum: Option<bool>,
-    pub Description: Option<String>,
-    pub MaximumAllowed: Option<u32>,
-    pub Type: Option<i32>,
-    pub InstallDate: Option<WMIDateTime>,
-    pub Status: Option<String>,
-    pub Caption: Option<String>,
+pub struct Win32_BootConfiguration {
     pub Name: Option<String>,
-    pub AccessMask: Option<u32>,
-    pub Path: Option<String>,
+    pub TempDirectory: Option<String>,
+    pub Description: Option<String>,
+    pub ConfigurationPath: Option<String>,
+    pub BootDirectory: Option<String>,
+    pub SettingID: Option<String>,
+    pub LastDrive: Option<String>,
+    pub ScratchDirectory: Option<String>,
+    pub Caption: Option<String>,
 }

@@ -21,20 +21,13 @@ use wmi::WMIDateTime;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Win32_Account {
-    pub Domain: Option<String>,
-    pub Status: Option<String>,
-    pub Name: Option<String>,
-    pub FullName: Option<String>,
-    pub PasswordRequired: Option<bool>,
-    pub SID: Option<String>,
-    pub InstallDate: Option<WMIDateTime>,
-    pub LocalAccount: Option<bool>,
-    pub PasswordChangeable: Option<bool>,
-    pub PasswordExpires: Option<bool>,
-    pub Description: Option<String>,
-    pub AccountType: Option<i64>,
     pub Caption: Option<String>,
-    pub Disabled: Option<bool>,
-    pub Lockout: Option<bool>,
-    pub SIDType: Option<u8>,
+    pub Description: Option<String>,
+    pub InstallDate: Option<WMIDateTime>,
+    pub Name: Option<String>,
+    pub Status: Option<String>,
+    pub Domain: Option<String>,
+    pub LocalAccount: Option<bool>,
+    pub SID: Option<String>,
+    pub SIDType: Option<u8>
 }

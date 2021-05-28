@@ -21,4 +21,24 @@ use wmi::WMIDateTime;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Win32_OnBoardDevice {
+    pub Caption: Option<String>,
+    pub Description: Option<String>,
+    pub InstallDate: Option<WMIDateTime>,
+    pub Name: Option<String>,
+    pub Status: Option<String>,
+    pub CreationClassName: Option<String>,
+    pub Manufacturer: Option<String>,
+    pub Model: Option<String>,
+    pub OtherIdentifyingInfo: Option<String>,
+    pub PartNumber: Option<String>,
+    pub PoweredOn: Option<bool>,
+    pub SerialNumber: Option<String>,
+    pub SKU: Option<String>,
+    pub Tag: Option<String>,
+    pub Version: Option<String>,
+    pub HotSwappable: Option<bool>,
+    pub Removable: Option<bool>,
+    pub Replaceable: Option<bool>,
+    pub DeviceType: Option<u16>,
+    pub Enabled: Option<bool>
 }
