@@ -45,13 +45,13 @@ pub fn genrate_print(results: Vec<QueryResult>) {
             for (key, value) in json_value.as_object().unwrap() {
                 println!(" - ");
                 if value.is_array() {
-                    println!("  {}: ", key);
+                    println!("    {}: ", key);
                     let n_value = value.as_array().unwrap();
                     for n_v in n_value {
-                        println!("      - {}", format!("{:#}", n_v));
+                        println!("        - {}", format!("{:#}", n_v));
                     }
                 } else {
-                    println!("  {}: {}", key, format!("{:#}", value));
+                    println!("    {}: {}", key, format!("{:#}", value));
                 }
             }
         }
@@ -101,7 +101,7 @@ pub fn genrate_xml(output_path:  &str, results: Vec<QueryResult>) {
     let date = &local_time.format("%d%m%Y%H%M%S").to_string();
     let write_line = || -> Result<(), Error> {
         writeln!(file, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>")?;
-        writeln!(file, "<collect date={:?} timestamp={:?} uuid=\"{}\">", date, local_time, new_uuid)?;
+        writeln!(file, "<collect date=\"{:?}\" timestamp=\"{:?}\" uuid=\"{}\">", date, local_time, new_uuid)?;
         for result in results {
             writeln!(file, "    <query class=\"{}\">", result.table)?;
             for json_value in result.result {

@@ -113,7 +113,7 @@ pub fn get_wmi_result<T: for<'de> Deserialize<'de> + Serialize>(table: String) -
 
     let results: Vec<T> = match wmi_con.query() {
         Ok(result)  => result,
-        Err(e) => {println!("{:#?}", e); panic!(e) },
+        Err(e) => {println!("{:#?}", e); Vec::<T>::new() },
     };
     for result in results {
         match serde_json::to_string(&result) {
